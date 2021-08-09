@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Distribution.Models;
 
 namespace Distribution.Data
 {
@@ -12,5 +13,6 @@ namespace Distribution.Data
             : base(options)
         {
         }
+        public DbSet<Distribution.Models.Record> Record { get; set; }
     }
 }
