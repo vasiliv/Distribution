@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Distribution.Data;
 using Distribution.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Distribution.Areas.User.Controllers
 {
     [Area("User")]
+    [Authorize(Roles = "Admin, User")]
     public class RecordController : Controller
     {
         private readonly ApplicationDbContext _context;
