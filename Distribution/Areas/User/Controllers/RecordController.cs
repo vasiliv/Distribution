@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Distribution.Data;
 using Distribution.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Distribution.Areas.User.Controllers
 {
@@ -16,10 +18,11 @@ namespace Distribution.Areas.User.Controllers
     public class RecordController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public RecordController(ApplicationDbContext context)
+        private readonly IWebHostEnvironment webHostEnvironment;
+        public RecordController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            webHostEnvironment = hostEnvironment;
         }
 
         // GET: User/Record
@@ -57,11 +60,17 @@ namespace Distribution.Areas.User.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,SecondName,PiradiNomeri")] Record @record)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,SecondName,PiradiNomeri,ContractPicture")] Record @record)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(@record);
+                string uniqueFileName = ProcessUploadedFile(@record);
+                Record record1 = new Record
+                {
+                    ContractPictureName = uniqueFileName
+                };
+
+                _context.Add(record1);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -151,6 +160,22 @@ namespace Distribution.Areas.User.Controllers
         private bool RecordExists(int id)
         {
             return _context.Record.Any(e => e.Id == id);
+        }
+        private string ProcessUploadedFile(Record model)
+        {
+            string uniqueFileName = null;
+
+            if (model.ContractPicture != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Uploads");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ContractPicture.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.ContractPicture.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
         }
     }
 }
