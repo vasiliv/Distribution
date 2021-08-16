@@ -83,7 +83,7 @@ namespace Distribution.Areas.User.Controllers
                 return NotFound();
             }
 
-            var @record = await _context.Record.FindAsync(id);
+            var @record = await _context.Record.FindAsync(id);            
             if (@record == null)
             {
                 return NotFound();
@@ -96,8 +96,9 @@ namespace Distribution.Areas.User.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,SecondName,PiradiNomeri")] Record @record)
+        public async Task<IActionResult> Edit(int id, /*[Bind("Id,FirstName,SecondName,PiradiNomeri,ContractPictureName")]*/ Record @record)
         {
+            
             if (id != @record.Id)
             {
                 return NotFound();
@@ -105,9 +106,14 @@ namespace Distribution.Areas.User.Controllers
 
             if (ModelState.IsValid)
             {
+                var @recordMod = await _context.Record.FindAsync(@record.Id);
                 try
-                {
-                    _context.Update(@record);
+                {                                         
+                    string filePath = Path.Combine(webHostEnvironment.WebRootPath, "Uploads", @record.ContractPictureName);
+                    System.IO.File.Delete(filePath);
+                    @recordMod.ContractPictureName = ProcessUploadedFile(@recordMod);
+                    
+                    _context.Update(@recordMod);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
