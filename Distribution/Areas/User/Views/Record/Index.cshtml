@@ -8,11 +8,14 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-area="User" asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ContractPicture)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.FirstName)
             </th>
@@ -29,6 +32,11 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                <a asp-area="User" asp-action="Details" asp-route-id="@item.Id">
+                    <img src="~/Uploads/@item.ContractPictureName" class="img-thumbnail" height="100" width="100" asp-append-version="true" />
+                </a>
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.FirstName)
             </td>
             <td>
@@ -38,9 +46,9 @@
                 @Html.DisplayFor(modelItem => item.PiradiNomeri)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-area="User" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-area="User" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-area="User" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

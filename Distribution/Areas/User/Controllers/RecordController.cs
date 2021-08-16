@@ -65,12 +65,10 @@ namespace Distribution.Areas.User.Controllers
             if (ModelState.IsValid)
             {
                 string uniqueFileName = ProcessUploadedFile(@record);
-                Record record1 = new Record
-                {
-                    ContractPictureName = uniqueFileName
-                };
+                @record.ContractPictureName = uniqueFileName;
+                
 
-                _context.Add(record1);
+                _context.Add(@record);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -161,18 +159,18 @@ namespace Distribution.Areas.User.Controllers
         {
             return _context.Record.Any(e => e.Id == id);
         }
-        private string ProcessUploadedFile(Record model)
+        private string ProcessUploadedFile(Record @record)
         {
             string uniqueFileName = null;
 
-            if (model.ContractPicture != null)
+            if (@record.ContractPicture != null)
             {
                 string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Uploads");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ContractPicture.FileName;
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + @record.ContractPicture.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    model.ContractPicture.CopyTo(fileStream);
+                    @record.ContractPicture.CopyTo(fileStream);
                 }
             }
             return uniqueFileName;
