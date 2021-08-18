@@ -20,6 +20,6 @@ namespace Distribution.Models
         public string PhoneNumber { get; set; }
         [NotMapped]
         public IFormFile ContractPicture { get; set; }
-        public string ContractPictureName { get; set; }
+        public Guid ContractPictureName { get; set; }        
     }
 }

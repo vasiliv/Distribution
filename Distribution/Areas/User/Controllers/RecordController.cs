@@ -65,7 +65,7 @@ namespace Distribution.Areas.User.Controllers
             if (ModelState.IsValid)
             {
                 string uniqueFileName = ProcessUploadedFile(@record);
-                @record.ContractPictureName = uniqueFileName;
+                @record.ContractPictureName = Guid.Parse(uniqueFileName);
                 
 
                 _context.Add(@record);
@@ -83,7 +83,10 @@ namespace Distribution.Areas.User.Controllers
                 return NotFound();
             }
 
-            var @record = await _context.Record.FindAsync(id);            
+            var @record = await _context.Record.FindAsync(id);
+            //var @record = await _context.Record.Include(x => x.ContractPictureName)
+            //    .FirstOrDefaultAsync(x => x.Id == id);
+
             if (@record == null)
             {
                 return NotFound();
@@ -109,9 +112,9 @@ namespace Distribution.Areas.User.Controllers
                 var @recordMod = await _context.Record.FindAsync(@record.Id);
                 try
                 {                                         
-                    string filePath = Path.Combine(webHostEnvironment.WebRootPath, "Uploads", @record.ContractPictureName);
+                    string filePath = Path.Combine(webHostEnvironment.WebRootPath, "Uploads", @record.ContractPictureName.ToString());
                     System.IO.File.Delete(filePath);
-                    @recordMod.ContractPictureName = ProcessUploadedFile(@recordMod);
+                    @record.ContractPictureName = Guid.Parse(ProcessUploadedFile(@record));
                     
                     _context.Update(@recordMod);
                     await _context.SaveChangesAsync();
@@ -172,7 +175,8 @@ namespace Distribution.Areas.User.Controllers
             if (@record.ContractPicture != null)
             {
                 string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Uploads");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + @record.ContractPicture.FileName;
+                //uniqueFileName = Guid.NewGuid().ToString() + "_" + @record.ContractPicture.FileName;
+                uniqueFileName =  @record.ContractPicture.FileName + "_" + @record.Id;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
