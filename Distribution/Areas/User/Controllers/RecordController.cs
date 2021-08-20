@@ -10,11 +10,12 @@ using Distribution.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Distribution.Areas.User.ViewModels;
 
 namespace Distribution.Areas.User.Controllers
 {
     [Area("User")]
-    [Authorize(Roles = "Admin, User")]
+    //[Authorize(Roles = "Admin, User")]
     public class RecordController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -60,19 +61,24 @@ namespace Distribution.Areas.User.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,SecondName,PiradiNomeri,ContractPicture")] Record @record)
+        public async Task<IActionResult> Create(RecordViewModel model)
         {
             if (ModelState.IsValid)
             {
-                string uniqueFileName = ProcessUploadedFile(@record);
-                @record.ContractPictureName = Guid.Parse(uniqueFileName);
-                
-
+                string uniqueFileName = ProcessUploadedFile(model);
+                Record @record = new Record
+                {
+                    FirstName = model.FirstName,
+                    SecondName = model.SecondName,
+                    PiradiNomeri = model.PiradiNomeri,
+                    PhoneNumber = model.PhoneNumber,
+                    ContractPictureName = uniqueFileName
+                };  
                 _context.Add(@record);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(@record);
+            return View(model);
         }
 
         // GET: User/Record/Edit/5
@@ -86,12 +92,20 @@ namespace Distribution.Areas.User.Controllers
             var @record = await _context.Record.FindAsync(id);
             //var @record = await _context.Record.Include(x => x.ContractPictureName)
             //    .FirstOrDefaultAsync(x => x.Id == id);
-
+            var recordViewModel = new RecordViewModel()
+            {
+                Id = @record.Id,
+                FirstName = @record.FirstName,
+                SecondName = @record.SecondName,
+                PiradiNomeri = @record.PiradiNomeri,
+                PhoneNumber = @record.PhoneNumber,
+                ExistingContractPicture = @record.ContractPictureName
+            };
             if (@record == null)
             {
                 return NotFound();
             }
-            return View(@record);
+            return View(recordViewModel);
         }
 
         // POST: User/Record/Edit/5
@@ -99,40 +113,30 @@ namespace Distribution.Areas.User.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, /*[Bind("Id,FirstName,SecondName,PiradiNomeri,ContractPictureName")]*/ Record @record)
+        public async Task<IActionResult> Edit(int id, RecordViewModel model)
         {
-            
-            if (id != @record.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                var @recordMod = await _context.Record.FindAsync(@record.Id);
-                try
-                {                                         
-                    string filePath = Path.Combine(webHostEnvironment.WebRootPath, "Uploads", @record.ContractPictureName.ToString());
-                    System.IO.File.Delete(filePath);
-                    @record.ContractPictureName = Guid.Parse(ProcessUploadedFile(@record));
-                    
-                    _context.Update(@recordMod);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
+                var @record = await _context.Record.FindAsync(model.Id);
+                @record.FirstName = model.FirstName;
+                @record.SecondName = model.SecondName;
+                @record.PiradiNomeri = model.PiradiNomeri;
+                @record.PhoneNumber = model.PhoneNumber;
+
+                if (model.ContractPicture != null)
                 {
-                    if (!RecordExists(@record.Id))
+                    if (model.ExistingContractPicture != null)
                     {
-                        return NotFound();
+                        string filePath = Path.Combine(webHostEnvironment.WebRootPath, "Uploads", model.ExistingContractPicture);
+                        System.IO.File.Delete(filePath);
                     }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                    @record.ContractPictureName = ProcessUploadedFile(model);
+                }                   
+                _context.Update(@record);
+                await _context.SaveChangesAsync();                
                 return RedirectToAction(nameof(Index));
             }
-            return View(@record);
+            return View();
         }
 
         // GET: User/Record/Delete/5
@@ -145,12 +149,21 @@ namespace Distribution.Areas.User.Controllers
 
             var @record = await _context.Record
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            var recordViewModel = new RecordViewModel()
+            {
+                Id = @record.Id,
+                FirstName = @record.FirstName,
+                SecondName = @record.SecondName,
+                PiradiNomeri = @record.PiradiNomeri,
+                PhoneNumber = @record.PhoneNumber,
+                ExistingContractPicture = @record.ContractPictureName
+            };
             if (@record == null)
             {
                 return NotFound();
             }
-
-            return View(@record);
+            return View(recordViewModel);
         }
 
         // POST: User/Record/Delete/5
@@ -159,8 +172,15 @@ namespace Distribution.Areas.User.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var @record = await _context.Record.FindAsync(id);
+            var CurrentContractImage = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", @record.ContractPictureName);
             _context.Record.Remove(@record);
-            await _context.SaveChangesAsync();
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                if (System.IO.File.Exists(CurrentContractImage))
+                {
+                    System.IO.File.Delete(CurrentContractImage);
+                }
+            }
             return RedirectToAction(nameof(Index));
         }
 
@@ -168,19 +188,19 @@ namespace Distribution.Areas.User.Controllers
         {
             return _context.Record.Any(e => e.Id == id);
         }
-        private string ProcessUploadedFile(Record @record)
+        private string ProcessUploadedFile(RecordViewModel model)
         {
             string uniqueFileName = null;
 
-            if (@record.ContractPicture != null)
+            if (model.ContractPicture != null)
             {
                 string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Uploads");
-                //uniqueFileName = Guid.NewGuid().ToString() + "_" + @record.ContractPicture.FileName;
-                uniqueFileName =  @record.ContractPicture.FileName + "_" + @record.Id;
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ContractPicture.FileName;
+                //uniqueFileName = @record.Id + "_" + @record.ContractPicture.FileName  ;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    @record.ContractPicture.CopyTo(fileStream);
+                    model.ContractPicture.CopyTo(fileStream);
                 }
             }
             return uniqueFileName;
