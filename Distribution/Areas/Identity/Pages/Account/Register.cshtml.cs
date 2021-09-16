@@ -79,10 +79,11 @@ namespace Distribution.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser { UserName = Input.Email, Email = Input.Email};
-                //var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {                    
+                    // adding user with User role
                     await _roleManager.CreateAsync(new IdentityRole("User"));
                     await _userManager.AddToRoleAsync(user, "User");
 

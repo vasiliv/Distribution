@@ -1,0 +1,2 @@
+﻿1. https://www.c-sharpcorner.com/article/adding-roles-to-registration-razor-page-in-asp-net-core-razor-pages-web-applicat/ - როდესაც ახალ დარეგისტრირებულ მომხმარებელს ავტომატურად ენიჭება User როლი (არა ადმინი)
+ 
