@@ -25,11 +25,11 @@ namespace Distribution.Controllers
             IdentityResult adminResult = await roleManager.CreateAsync(adminRole);
             IdentityResult userResult = await roleManager.CreateAsync(userRole);
 
-            IdentityUser user1 = await userManager.FindByIdAsync("4c50f734-3abc-4b71-9ecc-4c90fe6accc9");
+            IdentityUser user1 = await userManager.FindByIdAsync("3aeafca4-1cbe-43a9-9fda-9d669263bfd1");
             adminResult = await userManager.AddToRoleAsync(user1, "Admin");
 
-            IdentityUser user2 = await userManager.FindByIdAsync("77109523-7fa8-4710-ab9a-8fb4faaf06b7");
-            userResult = await userManager.AddToRoleAsync(user2, "User");
+            //IdentityUser user2 = await userManager.FindByIdAsync("77109523-7fa8-4710-ab9a-8fb4faaf06b7");
+            //userResult = await userManager.AddToRoleAsync(user2, "User");
             
             return View();
         }
