@@ -15,7 +15,7 @@ using Distribution.Areas.User.ViewModels;
 namespace Distribution.Areas.User.Controllers
 {
     [Area("User")]
-    //[Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User")]
     public class RecordController : Controller
     {
         private readonly ApplicationDbContext _context;
