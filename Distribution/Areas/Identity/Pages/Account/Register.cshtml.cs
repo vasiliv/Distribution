@@ -24,20 +24,20 @@ namespace Distribution.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         // davamate rom axali useri avtomaturad miigos User statusi
-        private readonly RoleManager<IdentityUser> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityUser> roleManager)
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            roleManager = _roleManager;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -82,7 +82,10 @@ namespace Distribution.Areas.Identity.Pages.Account
                 //var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
-                {
+                {                    
+                    await _roleManager.CreateAsync(new IdentityRole("User"));
+                    await _userManager.AddToRoleAsync(user, "User");
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
