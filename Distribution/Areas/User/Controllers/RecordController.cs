@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Distribution.Areas.User.ViewModels;
+using System.Security.Claims;
 
 namespace Distribution.Areas.User.Controllers
 {
@@ -28,7 +29,8 @@ namespace Distribution.Areas.User.Controllers
 
         // GET: User/Record
         public async Task<IActionResult> Index()
-        {
+        {         
+            
             return View(await _context.Record.ToListAsync());
         }
 
@@ -68,6 +70,7 @@ namespace Distribution.Areas.User.Controllers
                 string uniqueFileName = ProcessUploadedFile(model);
                 Record @record = new Record
                 {
+                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                     FirstName = model.FirstName,
                     SecondName = model.SecondName,
                     PiradiNomeri = model.PiradiNomeri,

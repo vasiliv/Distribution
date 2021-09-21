@@ -11,6 +11,7 @@ namespace Distribution.Models
     public class Record
     {
         public int Id { get; set; }
+        public string UserId { get; set; }
         [Display(Name = "სახელი")]
         public string FirstName { get; set; }
         [Display(Name = "გვარი")]
