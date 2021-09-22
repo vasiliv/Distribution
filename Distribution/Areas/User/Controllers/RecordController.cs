@@ -29,9 +29,12 @@ namespace Distribution.Areas.User.Controllers
 
         // GET: User/Record
         public async Task<IActionResult> Index()
-        {         
-            
-            return View(await _context.Record.ToListAsync());
+        {
+            var recordLoggedInUser = from r in _context.Record
+                                     where r.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)
+                                     select r;
+            return View(recordLoggedInUser);
+            //return View(await _context.Record.ToListAsync());
         }
 
         // GET: User/Record/Details/5
