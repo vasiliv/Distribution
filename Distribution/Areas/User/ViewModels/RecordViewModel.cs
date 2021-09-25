@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace Distribution.Areas.User.ViewModels
 {
     public class RecordViewModel
-    {
-        public int Id { get; set; }
+    {        
         [Display(Name = "სახელი")]
         public string FirstName { get; set; }
         [Display(Name = "გვარი")]

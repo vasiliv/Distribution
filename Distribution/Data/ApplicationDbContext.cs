@@ -13,6 +13,6 @@ namespace Distribution.Data
             : base(options)
         {
         }
-        public DbSet<Distribution.Models.Record> Record { get; set; }
+        public DbSet<Record> Record { get; set; }
     }
 }
