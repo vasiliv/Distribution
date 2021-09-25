@@ -10,6 +10,7 @@ namespace Distribution.Models
 {
     public class Record
     {
+        [Key]
         public int Id { get; set; }
         public string UserId { get; set; }
         [Display(Name = "სახელი")]

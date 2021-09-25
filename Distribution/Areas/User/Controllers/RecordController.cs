@@ -30,9 +30,13 @@ namespace Distribution.Areas.User.Controllers
         // GET: User/Record
         public async Task<IActionResult> Index()
         {
-            var recordLoggedInUser = await (from r in _context.Record
+            // shecdomas migdebs ratomgac
+            //var recordLoggedInUser = await (from r in _context.Record
+            //                                where r.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)
+            //                                select r).FirstOrDefaultAsync();
+            var recordLoggedInUser = from r in _context.Record
                                      where r.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)
-                                     select r).FirstOrDefaultAsync();
+                                     select r;
             return View(recordLoggedInUser);
             //return View(await _context.Record.ToListAsync());
         }

@@ -82,10 +82,14 @@ namespace Distribution.Areas.Identity.Pages.Account
                 
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
-                {                    
+                {
                     // adding user with User role
                     await _roleManager.CreateAsync(new IdentityRole("User"));
                     await _userManager.AddToRoleAsync(user, "User");
+
+                    // adding user with Admin role
+                    //await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                    //await _userManager.AddToRoleAsync(user, "Admin");
 
                     _logger.LogInformation("User created a new account with password.");
 
