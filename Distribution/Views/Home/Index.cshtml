@@ -2,7 +2,29 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (this.User.IsInRole("User"))
+{
+    <a asp-area="User"
+       asp-controller="Record"
+       asp-action="Index">All Contracts</a>
+    <br>
+    <a asp-area="User"
+       asp-controller="Record"
+       asp-action="Create">Create a Contract</a>
+    <br>
+}
+@if (this.User.IsInRole("Admin"))
+{
+    <a asp-area="Admin"
+       asp-controller="Reader"
+       asp-action="Index">View All Contracts</a>
+    <br>    
+}
+
+
+
+
+@*<div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>*@
