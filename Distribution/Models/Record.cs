@@ -13,13 +13,15 @@ namespace Distribution.Models
         [Key]
         public int Id { get; set; }
         public string UserId { get; set; }
-        [Display(Name = "სახელი")]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
-        [Display(Name = "გვარი")]
+        [Display(Name = "Last Name")]
         public string SecondName { get; set; }
-        [Display(Name = "პირადი ნომერი")]
+        [Display(Name = "Id Number")]
         public int PiradiNomeri { get; set; }
-        public string PhoneNumber { get; set; }        
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; }
+        [Display(Name = "Contract Photo")]
         public string ContractPictureName { get; set; }        
     }
 }
